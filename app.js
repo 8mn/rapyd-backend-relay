@@ -64,6 +64,16 @@ app.listen(5000, () => {
 // 	}
 // });
 
+app.get("/", async (req, res) => {
+	try {
+		res.json({
+			message: "Hello World!",
+		});
+	} catch (error) {
+		res.json(error);
+	}
+});
+
 app.post("/create-wallet", async (req, res) => {
 	try {
 		const body = req.body;
@@ -114,7 +124,6 @@ app.post("/simulate-payment", async (req, res) => {
 // 	}
 // });
 
-
 // app.get("/list-virtual-accounts", async (req, res) => {
 // 	try {
 // 		const result = await makeRequest(
@@ -126,5 +135,3 @@ app.post("/simulate-payment", async (req, res) => {
 // 		res.json(error);
 // 	}
 // });
-
-
