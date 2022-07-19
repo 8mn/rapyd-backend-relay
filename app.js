@@ -35,34 +35,34 @@ app.listen(5000, () => {
 	console.log("Server running on port 5000");
 });
 
-app.get("/country", async (req, res) => {
-	try {
-		const result = await makeRequest(
-			"GET",
-			"/v1/payment_methods/country?country=mx"
-		);
+// app.get("/country", async (req, res) => {
+// 	try {
+// 		const result = await makeRequest(
+// 			"GET",
+// 			"/v1/payment_methods/country?country=mx"
+// 		);
 
-		res.json(result);
-	} catch (error) {
-		res.json(error);
-	}
-});
+// 		res.json(result);
+// 	} catch (error) {
+// 		res.json(error);
+// 	}
+// });
 
-app.get("/payment", async (req, res) => {
-	try {
-		const body = {
-			amount: 230,
-			currency: "MXN",
-			payment_method: {
-				type: "mx_diestel_cash",
-			},
-		};
-		const result = await makeRequest("POST", "/v1/payments", body);
-		res.json(result);
-	} catch (error) {
-		res.json(error);
-	}
-});
+// app.get("/payment", async (req, res) => {
+// 	try {
+// 		const body = {
+// 			amount: 230,
+// 			currency: "MXN",
+// 			payment_method: {
+// 				type: "mx_diestel_cash",
+// 			},
+// 		};
+// 		const result = await makeRequest("POST", "/v1/payments", body);
+// 		res.json(result);
+// 	} catch (error) {
+// 		res.json(error);
+// 	}
+// });
 
 app.post("/create-wallet", async (req, res) => {
 	try {
@@ -86,11 +86,10 @@ app.post("/request-virtual-account", async (req, res) => {
 	}
 });
 
-
 app.post("/simulate-payment", async (req, res) => {
 	try {
 		const body = req.body;
-		console.log(body);
+		// console.log(body);
 		const result = await makeRequest(
 			"POST",
 			"/v1/issuing/bankaccounts/bankaccounttransfertobankaccount",
@@ -101,3 +100,31 @@ app.post("/simulate-payment", async (req, res) => {
 		res.json(error);
 	}
 });
+
+// app.get("/country", async (req, res) => {
+// 	try {
+// 		const result = await makeRequest(
+// 			"GET",
+// 			"/v1/payment_methods/country?country=mx"
+// 		);
+
+// 		res.json(result);
+// 	} catch (error) {
+// 		res.json(error);
+// 	}
+// });
+
+
+// app.get("/list-virtual-accounts", async (req, res) => {
+// 	try {
+// 		const result = await makeRequest(
+// 			"GET",
+// 			"/v1/bankaccounts/list?ewallet=ewallet_5d616c29e44b710fcb040c95a94eac72"
+// 		);
+// 		res.json(result);
+// 	} catch (error) {
+// 		res.json(error);
+// 	}
+// });
+
+

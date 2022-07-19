@@ -32,6 +32,7 @@ async function makeRequest(method, urlPath, body = null) {
 		return await httpRequest(options, body, log);
 	} catch (error) {
 		console.error("Error generating request options");
+		// console.log(options);
 		throw error;
 	}
 }
