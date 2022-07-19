@@ -35,18 +35,18 @@ app.listen(process.env.PORT || 5000, () => {
 	console.log("Server running on port 5000");
 });
 
-// app.get("/country", async (req, res) => {
-// 	try {
-// 		const result = await makeRequest(
-// 			"GET",
-// 			"/v1/payment_methods/country?country=mx"
-// 		);
+app.get("/country", async (req, res) => {
+	try {
+		const result = await makeRequest(
+			"GET",
+			"/v1/payment_methods/country?country=mx"
+		);
 
-// 		res.json(result);
-// 	} catch (error) {
-// 		res.json(error);
-// 	}
-// });
+		res.json(result);
+	} catch (error) {
+		res.json(error);
+	}
+});
 
 // app.get("/payment", async (req, res) => {
 // 	try {
@@ -77,7 +77,7 @@ app.get("/", async (req, res) => {
 app.post("/create-wallet", async (req, res) => {
 	try {
 		const body = req.body;
-		console.log(body);
+		// console.log(body);
 		const result = await makeRequest("POST", "/v1/user", body);
 		res.json(result);
 	} catch (error) {
@@ -88,7 +88,7 @@ app.post("/create-wallet", async (req, res) => {
 app.post("/request-virtual-account", async (req, res) => {
 	try {
 		const body = req.body;
-		console.log(body);
+		// console.log(body);
 		const result = await makeRequest("POST", "/v1/issuing/bankaccounts", body);
 		res.json(result);
 	} catch (error) {
