@@ -123,3 +123,5 @@ async function httpRequest(options, body) {
 }
 
 exports.makeRequest = makeRequest;
+exports.sign = sign;
+exports.generateRandomString = generateRandomString;

@@ -22,8 +22,52 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const makeRequest = require("./utilities").makeRequest;
 
-// const jsonParser = bodyParser.json();
-// var urlencodedParser = bodyParser.urlencoded({ extended: false });
+const admin = require("firebase-admin");
+// const serviceAccount = require("./serviceAccountKey.json");
+
+const crypto = require("crypto");
+const accessKey = process.env.ACCESS_KEY;
+const secretKey = process.env.SECRET_KEY;
+const log = false;
+
+// const serviceAccount = JSON.parse(process.env.GOOGLE_CREDS);
+
+// const configg = Buffer.from(JSON.stringify(serviceAccount)).toString("base64");
+
+// console.log(configg);
+
+// console.log(serviceAccount)
+
+admin.initializeApp({
+	credential: admin.credential.cert(
+		JSON.parse(
+			Buffer.from(process.env.GOOGLE_CONFIG_BASE64, "base64").toString("ascii")
+		)
+	),
+});
+
+const db = admin.firestore();
+
+
+//get transactions from firebase
+// function getTransactions(req, res) {
+// 	db.collection("transactions")
+
+// 		.get()
+// 		.then((snapshot) => {
+// 			let transactions = [];
+// 			snapshot.forEach((doc) => {
+// 				transactions.push(doc.data());
+// 			});
+
+// 			console.log(transactions);
+// 		})
+// 		.catch((err) => {
+// 			console.log("Error getting documents", err);
+// 		});
+// }
+
+
 
 const app = express();
 app.use(cors());
@@ -111,27 +155,56 @@ app.post("/simulate-payment", async (req, res) => {
 	}
 });
 
-// app.get("/country", async (req, res) => {
-// 	try {
-// 		const result = await makeRequest(
-// 			"GET",
-// 			"/v1/payment_methods/country?country=mx"
-// 		);
+function sign(urlPath, salt, timestamp, body) {
+	try {
+		let bodyString = "";
+		if (body) {
+			bodyString = JSON.stringify(body);
+			bodyString = bodyString == "{}" ? "" : bodyString;
+		}
 
-// 		res.json(result);
-// 	} catch (error) {
-// 		res.json(error);
-// 	}
-// });
+		let toSign =
+			urlPath + salt + timestamp + accessKey + secretKey + bodyString;
+		log && console.log(`toSign: ${toSign}`);
 
-// app.get("/list-virtual-accounts", async (req, res) => {
-// 	try {
-// 		const result = await makeRequest(
-// 			"GET",
-// 			"/v1/bankaccounts/list?ewallet=ewallet_5d616c29e44b710fcb040c95a94eac72"
-// 		);
-// 		res.json(result);
-// 	} catch (error) {
-// 		res.json(error);
-// 	}
-// });
+		let hash = crypto.createHmac("sha256", secretKey);
+		hash.update(toSign);
+		const signature = Buffer.from(hash.digest("hex")).toString("base64");
+		log && console.log(`signature: ${signature}`);
+
+		return signature;
+	} catch (error) {
+		console.error("Error generating signature");
+		throw error;
+	}
+}
+
+app.post("/hook", (req, res) => {
+	// console.log(req.body);
+	// console.log(req.headers);
+
+	// httpBaseURL = "https://96b8-103-151-234-240.in.ngrok.io";
+	httpURLPath = "https://96b8-103-151-234-240.in.ngrok.io/hook";
+	salt = req.headers["salt"];
+	timestamp = req.headers["timestamp"];
+	body = req.body;
+
+	signature = sign(httpURLPath, salt, timestamp, body);
+
+	if (req.headers["signature"] === signature) {
+		console.log("Signature is valid");
+		// res.json({
+		// 	message: "Signature is valid",
+		// 	body: body,
+		// });
+
+		db.collection("transactions").add(body);
+
+		res.send("OK");
+	} else {
+		console.log("Signature is invalid");
+		// res.send("KO");
+	}
+
+	// res.sendStatus(200).end();
+});
