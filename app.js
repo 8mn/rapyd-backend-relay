@@ -184,7 +184,7 @@ app.post("/hook", (req, res) => {
 	// console.log(req.headers);
 
 	// httpBaseURL = "https://96b8-103-151-234-240.in.ngrok.io";
-	httpURLPath = "https://96b8-103-151-234-240.in.ngrok.io/hook";
+	httpURLPath = "https://rapyd-starliner-backend.herokuapp.com/hook";
 	salt = req.headers["salt"];
 	timestamp = req.headers["timestamp"];
 	body = req.body;
