@@ -1,20 +1,3 @@
-/**
- * Rapyd Integrations: Request Signature.
- *
- * This app implements the Rapyd's API request signature. The crypto-js library
- * is required (https://www.npmjs.com/package/crypto-js). To install it, run:
- *
- * npm install crypto-js
- *
- * @link   https://docs.rapyd.net/
- * @file   This files defines the main node.js application.
- * @author Isaac Benitez.
- * @version 0.0.1
- *
- * @requires express
- * @requires https
- * @requires crypto-js
- */
 
 require("dotenv").config();
 const cors = require("cors");
@@ -140,9 +123,18 @@ app.post("/request-virtual-account", async (req, res) => {
 	}
 });
 
+
+let userID
+
 app.post("/simulate-payment", async (req, res) => {
 	try {
 		const body = req.body;
+		console.log(body);
+		userID = body.userID;
+		delete body.userID;
+	
+
+		// console.log(userID, "simulate-payment");
 		// console.log(body);
 		const result = await makeRequest(
 			"POST",
@@ -180,11 +172,10 @@ function sign(urlPath, salt, timestamp, body) {
 }
 
 app.post("/hook", (req, res) => {
-	// console.log(req.body);
-	// console.log(req.headers);
 
-	// httpBaseURL = "https://96b8-103-151-234-240.in.ngrok.io";
-	httpURLPath = "https://rapyd-starliner-backend.herokuapp.com/hook";
+
+
+	httpURLPath = process.env.APP_URI;
 	salt = req.headers["salt"];
 	timestamp = req.headers["timestamp"];
 	body = req.body;
@@ -199,12 +190,33 @@ app.post("/hook", (req, res) => {
 		// });
 
 		db.collection("transactions").add(body);
+		//add the transaction to users collection
+		// console.log(userID, "/hook")
+		db.collection("users")
+			.doc(userID)
+			.update({
+				transactions: admin.firestore.FieldValue.arrayUnion(body),
+			});
+
+		if(body.data.amount === 50000){
+			db.collection("users").doc(userID).update({
+				depositPaid: true,
+			});
+		} else{
+			db.collection("users").doc(userID).update({
+				paymentCompleted: true,
+			});
+		}
+
+
+
 
 		res.send("OK");
 	} else {
 		console.log("Signature is invalid");
-		// res.send("KO");
 	}
 
 	// res.sendStatus(200).end();
+	//end the response
+	res.end();
 });
