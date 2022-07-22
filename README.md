@@ -1,4 +1,4 @@
-# Rapyd starlliner:backend
+# Rapyd starliner(backend)
 
 ## Introduction
 
@@ -45,9 +45,7 @@ APP_URI=""
 GOOGLE_CONFIG_BASE64=""
 
 ```
-
 ## Running the App
-
 
 ```
 npm run start
